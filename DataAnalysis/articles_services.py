@@ -38,8 +38,57 @@ def getArticlesCountByDate():
             '$sort': {
                 'count': -1
             }
+        },
+        {
+            '$project': {
+                '_id': 0,
+                'date': '$_id',
+                'count': '$count'
+            }
         }
     ]
 
+    result = list(collection.aggregate(pipeline))
+    return jsonify(result)
+
+
+# get articles by word count
+def getArticlesByWordCount():
+    pipeline = [
+        {
+            '$addFields': {
+                'word_count': {
+                    '$toInt': '$word_count'
+                }
+            }
+        }, {
+            '$project': {
+                'word_count': '$word_count'
+            }
+        }, {
+            '$match': {
+                'word_count': {
+                    '$ne': 0
+                }
+            }
+        }, {
+            '$group': {
+                '_id': '$word_count',
+                'count': {
+                    '$sum': 1
+                }
+            }
+        }, {
+            '$sort': {
+                'count': -1
+            }
+        }, {
+            '$project': {
+                '_id': 0,
+                'word_count': '$_id',
+                'count': '$count'
+            }
+        }
+    ]
     result = list(collection.aggregate(pipeline))
     return jsonify(result)
