@@ -3,7 +3,17 @@ from bs4 import BeautifulSoup
 import requests
 
 
-#this function is used to get the article data content
+def getArticles(month_url):
+    # fetch and parse month articles page
+    response = requests.get(month_url)
+    response.raise_for_status()
+    soup = BeautifulSoup(response.text, 'lxml')
+    loc_tags = soup.find_all('loc')  # get articles url tag
+    loc_contents = [loc.text for loc in loc_tags]  # get articles url
+    return loc_contents
+
+
+# this function is used to get the article data content
 def getArticleContent(url):
     try:
 
@@ -53,6 +63,3 @@ def getArticleContent(url):
         }
     except (requests.exceptions.RequestException, ValueError) as e:
         return f"Error occurred: {e}"
-
-
-
