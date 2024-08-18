@@ -1,10 +1,6 @@
-import pymongo
 from flask import Flask, jsonify, request
 
-# connect to mongo DB
-client = pymongo.MongoClient("mongodb://localhost:27017/")
-db = client["DataEngine"]
-collection = db["Articles"]
+import mongo_connection
 
 
 # get articles count by date
@@ -48,7 +44,7 @@ def getArticlesCountByDate():
         }
     ]
 
-    result = list(collection.aggregate(pipeline))
+    result = list(mongo_connection.collection.aggregate(pipeline))
     return jsonify(result)
 
 
@@ -90,5 +86,5 @@ def getArticlesByWordCount():
             }
         }
     ]
-    result = list(collection.aggregate(pipeline))
+    result = list(mongo_connection.collection.aggregate(pipeline))
     return jsonify(result)
