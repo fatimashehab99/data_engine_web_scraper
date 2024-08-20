@@ -38,5 +38,10 @@ def categories():
     return DataAnalysis.categories_service.getCategoriesWithArticlesCount()
 
 
+@app.route("/articles_by_year/<year>", methods=['GET'])
+def articles_by_year(year):
+    return DataAnalysis.articles_service.getArticlesByYear(year)
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)

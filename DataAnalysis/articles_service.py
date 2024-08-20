@@ -88,3 +88,47 @@ def getArticlesByWordCount():
     ]
     result = list(mongo_connection.collection.aggregate(pipeline))
     return jsonify(result)
+
+
+# this function is used to get articles by year
+def getArticlesByYear(year):
+    pipeline = [
+        {
+            '$addFields': {
+                'published_date': {
+                    '$dateFromString': {
+                        'dateString': '$published_date'
+                    }
+                }
+            }
+        }, {
+            '$project': {
+                '_id': 0,
+                'date': {
+                    '$dateToString': {
+                        'format': '%Y',
+                        'date': '$published_date'
+                    }
+                }
+            }
+        }, {
+            '$match': {
+                'date': year
+            }
+        }, {
+            '$group': {
+                '_id': '$date',
+                'articles': {
+                    '$sum': 1
+                }
+            }
+        }, {
+            '$project': {
+                '_id': 0,
+                'date': '$_id',
+                'articles': 1
+            }
+        }
+    ]
+    result = list(mongo_connection.collection.aggregate(pipeline))
+    return jsonify(result)
