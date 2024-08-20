@@ -48,7 +48,7 @@ def getArticleContent(url):
             "type": article_data.get("type"),
             "title": article_data.get("title"),
             "url": url,
-            "keywords": article_data.get("keywords", []),
+            "keywords": [keyword.strip() for keyword in article_data["keywords"].split(",")],
             "thumbnail": article_data.get("thumbnail"),
             "video_duration": article_data.get("video_duration"),
             "word_count": article_data.get("word_count"),
