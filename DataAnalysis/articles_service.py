@@ -132,3 +132,25 @@ def getArticlesByYear(year):
     ]
     result = list(mongo_connection.collection.aggregate(pipeline))
     return jsonify(result)
+
+
+# this function is used to get the longest article
+def getLongestArticle():
+    pipeline = [
+        {
+            '$project': {
+                'word_count': 1,
+                '_id': 0,
+                'title': 1,
+                'url': 1
+            }
+        }, {
+            '$sort': {
+                'word_count': -1
+            }
+        }, {
+            '$limit': 10
+        }
+    ]
+    result = list(mongo_connection.collection.aggregate(pipeline))
+    return jsonify(result)

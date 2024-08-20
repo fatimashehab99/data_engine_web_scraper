@@ -43,5 +43,10 @@ def articles_by_year(year):
     return DataAnalysis.articles_service.getArticlesByYear(year)
 
 
+@app.route("/longest_articles", methods=['GET'])
+def longest_articles():
+    return DataAnalysis.articles_service.getLongestArticle()
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)
