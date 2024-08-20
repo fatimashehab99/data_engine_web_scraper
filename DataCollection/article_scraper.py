@@ -43,6 +43,7 @@ def getArticleContent(url):
             elif mapping == "posttype":
                 post_type = value
 
+        # toDo clean data where category is not null and extract only article
         return {
             "post_id": article_data.get("postid"),
             "type": article_data.get("type"),

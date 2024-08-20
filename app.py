@@ -3,6 +3,7 @@ from flask import Flask, jsonify, request
 import DataAnalysis.articles_service
 import DataAnalysis.authors_service
 import DataAnalysis.keywords_service
+import DataAnalysis.categories_service
 
 app = Flask(__name__)
 
@@ -25,6 +26,11 @@ def top_authors():
 @app.route("/top_keywords", methods=['GET'])
 def top_keywords():
     return DataAnalysis.keywords_service.getTopKeyword()
+
+
+@app.route("/categories", methods=['GET'])
+def categories():
+    return DataAnalysis.categories_service.getCategoriesWithArticlesCount()
 
 
 if __name__ == '__main__':
