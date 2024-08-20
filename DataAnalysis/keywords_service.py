@@ -37,3 +37,27 @@ def getTopKeyword():
     ]
     result = list(mongo_connection.collection.aggregate(pipeline))
     return jsonify(result)
+
+
+# this function is used to get articles by keyword
+def getArticlesByKeyword(keyword):
+    pipeline = [
+        {
+            '$project': {
+                '_id': 0,
+                'url': 1,
+                'keywords': 1,
+                'title': 1
+            }
+        }, {
+            '$unwind': {
+                'path': '$keywords'
+            }
+        }, {
+            '$match': {
+                'keywords': keyword
+            }
+        }
+    ]
+    result = list(mongo_connection.collection.aggregate(pipeline))
+    return jsonify(result)

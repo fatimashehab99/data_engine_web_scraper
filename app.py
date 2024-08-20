@@ -28,6 +28,11 @@ def top_keywords():
     return DataAnalysis.keywords_service.getTopKeyword()
 
 
+@app.route("/articles_by_keyword/<keyword>", methods=['GET'])
+def articles_by_keywords(keyword):
+    return DataAnalysis.keywords_service.getArticlesByKeyword(keyword)
+
+
 @app.route("/categories", methods=['GET'])
 def categories():
     return DataAnalysis.categories_service.getCategoriesWithArticlesCount()
