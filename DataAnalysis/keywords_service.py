@@ -2,16 +2,21 @@ from flask import Flask, jsonify, request
 import mongo_connection
 
 
-# this function is used to get top authors
-def getTopAuthors():
+# this function is used to get top keywords
+def getTopKeyword():
     pipeline = [
         {
             '$project': {
-                'author': '$author'
+                'keywords': 1,
+                '_id': 0
+            }
+        }, {
+            '$unwind': {
+                'path': '$keywords'
             }
         }, {
             '$group': {
-                '_id': '$author',
+                '_id': '$keywords',
                 'count': {
                     '$sum': 1
                 }
@@ -19,16 +24,16 @@ def getTopAuthors():
         }, {
             '$project': {
                 '_id': 0,
-                'author': '$_id',
-                'count': '$count'
+                'keyword': '$_id',
+                'count': 1
             }
         }, {
             '$sort': {
                 'count': -1
             }
+        }, {
+            '$limit': 10
         }
     ]
     result = list(mongo_connection.collection.aggregate(pipeline))
     return jsonify(result)
-
-#this function is used to

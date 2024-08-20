@@ -2,6 +2,8 @@ from flask import Flask, jsonify, request
 
 import DataAnalysis.articles_service
 import DataAnalysis.authors_service
+import DataAnalysis.keywords_service
+
 app = Flask(__name__)
 
 
@@ -14,9 +16,16 @@ def articles_by_date():
 def articles_by_word_count():
     return DataAnalysis.articles_service.getArticlesByWordCount()
 
-@app.route("/top_authors",methods=['GET'])
+
+@app.route("/top_authors", methods=['GET'])
 def top_authors():
     return DataAnalysis.authors_service.getTopAuthors()
+
+
+@app.route("/top_keywords", methods=['GET'])
+def top_keywords():
+    return DataAnalysis.keywords_service.getTopKeyword()
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)
