@@ -1,13 +1,26 @@
 import pymongo
+from dataclasses import asdict
+
+# Create a global variable for the client, db, and collection
+client = None
+db = None
+collection = None
 
 
-# this function is used to store the article data into mongo DB
-def storeToMongoDB(article_data):
-    # connect to mongo DB
-    client = pymongo.MongoClient("mongodb://localhost:27017/")
-    db = client["DataEngine"]
-    collection = db["Articles"]
+def get_db_connection():
+    global client, db, collection
 
-    # Load and insert JSON data
-    collection.insert_many(article_data)
+    if client is None:
+        client = pymongo.MongoClient("mongodb://localhost:27017/")  # Create client if not exists
+        db = client["DataEngine"]  # Set db if not exists
+        collection = db["Articles"]  # Set collection if not exists
+
+    return collection
+
+
+# This function stores the article data into MongoDB
+def storeToMongoDB(article):
+    collection = get_db_connection()  # Get the collection from the reused connection
+    article_data = asdict(article)  # Convert dataclass to dictionary
+    collection.insert_one(article_data)  # Insert into MongoDB
     print("Data inserted successfully!")

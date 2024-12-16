@@ -2,6 +2,8 @@ import json
 from bs4 import BeautifulSoup
 import requests
 
+from Models.Article import Article
+
 
 def getArticles(month_url):
     # fetch and parse month articles page
@@ -43,24 +45,27 @@ def getArticleContent(url):
             elif mapping == "posttype":
                 post_type = value
 
-        # toDo clean data where category is not null and extract only article
-        return {
-            "post_id": article_data.get("postid"),
-            "type": article_data.get("type"),
-            "title": article_data.get("title"),
-            "url": url,
-            "keywords": [keyword.strip() for keyword in article_data["keywords"].split(",")],
-            "thumbnail": article_data.get("thumbnail"),
-            "video_duration": article_data.get("video_duration"),
-            "word_count": article_data.get("word_count"),
-            "published_date": article_data.get("published_time"),
-            "updated_date": article_data.get("last_updated"),
-            "description": article_data.get("description"),
-            "author": article_data.get("author"),
-            "classes": article_data.get("classes", []),
-            "category": category,
-            "country": country,
-            "post_type": post_type
-        }
+        if category == "":
+            category = post_type
+        url = url
+        postId = article_data.get("postid")
+        type = article_data.get("type")
+        title = article_data.get("title")
+        keywords = [keyword.strip() for keyword in article_data["keywords"].split(",")]
+        thumbnail = article_data.get("thumbnail")
+        video_duration = article_data.get("video_duration")
+        word_count = int(article_data.get("word_count"))
+        published_date = article_data.get("published_time")
+        updated_date = article_data.get("last_updated")
+        description = article_data.get("description")
+        author = article_data.get("author")
+        classes = article_data.get("classes", [])
+        category = category
+        country = country
+        post_type = post_type
+
+        article = Article(url, postId, type, title, thumbnail, video_duration, word_count, published_date, updated_date,
+                          description, author, category, country, post_type, classes, keywords)
+        return article
     except (requests.exceptions.RequestException, ValueError) as e:
         return f"Error occurred: {e}"

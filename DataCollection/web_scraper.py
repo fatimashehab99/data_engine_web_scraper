@@ -1,6 +1,5 @@
-from article_scraper import getArticleContent
-from article_storage import storeToMongoDB
-from article_scraper import getArticles
+from .article_scraper import getArticleContent, getArticles
+from .article_storage import storeToMongoDB
 
 
 def main():
@@ -10,9 +9,8 @@ def main():
     articles_url = getArticles("https://www.almayadeen.net/sitemaps/all/sitemap-2024-8.xml")
     # get article data ans store it in mongo DB
     for article_url in articles_url:
-        article_data.append(getArticleContent(article_url))
-    storeToMongoDB(article_data)
-
+        article=getArticleContent(article_url)
+        storeToMongoDB(article)
 
 if __name__ == "__main__":
     main()
