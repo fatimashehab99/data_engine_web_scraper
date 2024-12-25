@@ -11,9 +11,55 @@ import DataAnalysis.post_types_services
 app = Flask(__name__)
 
 
+@app.route('/dashboard', methods=['GET'])
+def dashboard():
+    year = request.args.get('year', default=None, type=int)
+    month = request.args.get('month', default=None, type=int)
+    country = request.args.get('country', default=None, type=str)
+
+    authors_count = DataAnalysis.authors_service.getAuthorsCount(year, month, country)
+    articles_count = DataAnalysis.articles_service.getArticleCount(year, month, country)
+    return jsonify({"authors_count": authors_count, "articles_count": articles_count})
+
+
 @app.route('/articles_by_date', methods=['GET'])
 def articles_by_date():
-    return DataAnalysis.articles_service.getArticlesCountByDate()
+    year = request.args.get('year', default=None, type=int)
+    month = request.args.get('month', default=None, type=int)
+    country = request.args.get('country', default=None, type=str)
+    return DataAnalysis.articles_service.getArticleCount(year, month, country)
+
+
+@app.route('/type_count', methods=['GET'])
+def type_count():
+    year = request.args.get('year', default=None, type=int)
+    month = request.args.get('month', default=None, type=int)
+    country = request.args.get('country', default=None, type=str)
+    return DataAnalysis.post_types_services.getTypeCount(year, month, country)
+
+
+@app.route('/articles_by_word_count', methods=['GET'])
+def articles_by_word_count():
+    year = request.args.get('year', default=None, type=int)
+    month = request.args.get('month', default=None, type=int)
+    country = request.args.get('country', default=None, type=str)
+    return DataAnalysis.articles_service.getArticlesByWordCount(year, month, country)
+
+
+@app.route('/recent_articles', methods=['GET'])
+def recent_articles():
+    year = request.args.get('year', default=None, type=int)
+    month = request.args.get('month', default=None, type=int)
+    country = request.args.get('country', default=None, type=str)
+    return DataAnalysis.articles_service.getRecentArticles(year, month, country)
+
+
+@app.route("/longest_articles", methods=['GET'])
+def longest_articles():
+    year = request.args.get('year', default=None, type=int)
+    month = request.args.get('month', default=None, type=int)
+    country = request.args.get('country', default=None, type=str)
+    return DataAnalysis.articles_service.getLongestArticles(year, month, country)
 
 
 @app.route("/top_authors", methods=['GET'])

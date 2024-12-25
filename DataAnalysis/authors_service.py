@@ -4,6 +4,26 @@ import helpers
 import mongo_connection
 
 
+# this function is used to get authors count
+def getAuthorsCount(year, month, country):
+    pipeline = []
+    if year and month:
+        pipeline.extend(helpers.dateFilter(year, month))
+    if country:
+        pipeline.append(helpers.countryFilter(country))
+    pipeline.extend([
+        {
+            '$group': {
+                '_id': '$author'
+            }
+        }, {
+            '$count': 'author_articles'
+        }
+    ])
+    result = list(mongo_connection.collection.aggregate(pipeline))
+    return result[0].get("author_articles") if result else None
+
+
 # this function is used to get top authors
 def getTopAuthors(year, month, country):
     pipeline = []
@@ -37,5 +57,3 @@ def getTopAuthors(year, month, country):
     ])
     result = list(mongo_connection.collection.aggregate(pipeline))
     return jsonify(result)
-
-# this function is used to

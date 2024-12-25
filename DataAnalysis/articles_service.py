@@ -1,91 +1,61 @@
 from flask import Flask, jsonify, request
 
+import helpers
 import mongo_connection
 
 
-# get articles count by date
-def getArticlesCountByDate():
-    pipeline = [
+# get article count
+def getArticleCount(year, month, country):
+    pipeline = []
+    if year and month:
+        pipeline.extend(helpers.dateFilter(year, month))
+    if country:
+        pipeline.append(helpers.countryFilter(country))
+    pipeline.extend([
         {
-            '$addFields': {
-                'published_date_as_date': {
-                    '$dateFromString': {
-                        'dateString': '$published_date'
-                    }
-                }
-            }
-        }, {
-            '$project': {
-                'date': {
-                    '$dateToString': {
-                        'format': '%Y-%m-%d',
-                        'date': '$published_date_as_date'
-                    }
-                }
-            }
-        }, {
-            '$group': {
-                '_id': '$date',
-                'count': {
-                    '$sum': 1
-                }
-            }
-        }, {
-            '$sort': {
-                'count': -1
-            }
-        },
-        {
-            '$project': {
-                '_id': 0,
-                'date': '$_id',
-                'count': '$count'
-            }
+            '$count': 'articles_count'
         }
-    ]
-
+    ])
     result = list(mongo_connection.collection.aggregate(pipeline))
-    return jsonify(result)
+    return result[0].get("articles_count") if result else None
 
 
 # get articles by word count
-def getArticlesByWordCount():
-    pipeline = [
-        {
-            '$addFields': {
-                'word_count': {
-                    '$toInt': '$word_count'
-                }
-            }
-        }, {
-            '$project': {
-                'word_count': '$word_count'
-            }
-        }, {
-            '$match': {
-                'word_count': {
-                    '$ne': 0
-                }
-            }
-        }, {
-            '$group': {
-                '_id': '$word_count',
-                'count': {
-                    '$sum': 1
-                }
-            }
-        }, {
-            '$sort': {
-                'count': -1
-            }
-        }, {
-            '$project': {
-                '_id': 0,
-                'word_count': '$_id',
-                'count': '$count'
+def getArticlesByWordCount(year, month, country):
+    pipeline = []
+    if year and month:
+        pipeline.extend(helpers.dateFilter(year, month))
+    if country:
+        pipeline.append(helpers.countryFilter(country))
+    pipeline.extend([{
+        '$project': {
+            'word_count': '$word_count'
+        }
+    }, {
+        '$match': {
+            'word_count': {
+                '$ne': 0
             }
         }
-    ]
+    }, {
+        '$group': {
+            '_id': '$word_count',
+            'count': {
+                '$sum': 1
+            }
+        }
+    }, {
+        '$sort': {
+            'count': -1
+        }
+    }, {
+        '$project': {
+            '_id': 0,
+            'word_count': '$_id',
+            'articles_count': '$count'
+        }
+    }
+    ])
     result = list(mongo_connection.collection.aggregate(pipeline))
     return jsonify(result)
 
@@ -135,14 +105,20 @@ def getArticlesByYear(year):
 
 
 # this function is used to get the longest article
-def getLongestArticle():
-    pipeline = [
+def getLongestArticles(year, month, country):
+    pipeline = []
+    if year and month:
+        pipeline.extend(helpers.dateFilter(year, month))
+    if country:
+        pipeline.append(helpers.countryFilter(country))
+    pipeline.extend([
         {
             '$project': {
-                'word_count': 1,
+                'word_count': '$word_count',
                 '_id': 0,
-                'title': 1,
-                'url': 1
+                'url': '$url',
+                'post_id': '$postId',
+                'title': '$title'
             }
         }, {
             '$sort': {
@@ -151,6 +127,33 @@ def getLongestArticle():
         }, {
             '$limit': 10
         }
-    ]
+    ])
+    result = list(mongo_connection.collection.aggregate(pipeline))
+    return jsonify(result)
+
+
+# this function is used to get recent 10 articles
+def getRecentArticles(year, month, country):
+    pipeline = []
+    if year and month:
+        pipeline.extend(helpers.dateFilter(year, month))
+    if country:
+        pipeline.append(helpers.countryFilter(country))
+    pipeline.extend([
+        {
+            '$sort': {
+                'published_date': 1
+            }
+        }, {
+            '$project': {
+                '_id': 0,
+                'url': '$url',
+                'post_id': '$postId',
+                'title': '$title'
+            }
+        }, {
+            '$limit': 10
+        }
+    ])
     result = list(mongo_connection.collection.aggregate(pipeline))
     return jsonify(result)
