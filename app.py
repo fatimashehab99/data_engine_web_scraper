@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+from spacy.lang.en.tokenizer_exceptions import string
 
 import DataAnalysis.articles_service
 import DataAnalysis.authors_service
@@ -13,40 +14,34 @@ def articles_by_date():
     return DataAnalysis.articles_service.getArticlesCountByDate()
 
 
-@app.route('/articles_by_word_count', methods=['GET'])
-def articles_by_word_count():
-    return DataAnalysis.articles_service.getArticlesByWordCount()
-
-
 @app.route("/top_authors", methods=['GET'])
 def top_authors():
-    return DataAnalysis.authors_service.getTopAuthors()
+    year = request.args.get('year', default=None, type=int)
+    month = request.args.get('month', default=None, type=int)
+    country = request.args.get('country', default=None, type=str)
+    return DataAnalysis.authors_service.getTopAuthors(year, month, country)
 
 
 @app.route("/top_keywords", methods=['GET'])
 def top_keywords():
-    return DataAnalysis.keywords_service.getTopKeyword()
+    year = request.args.get('year', default=None, type=int)
+    month = request.args.get('month', default=None, type=int)
+    country = request.args.get('country', default=None, type=str)
+    return DataAnalysis.keywords_service.getTopKeyword(year, month, country)
 
 
-@app.route("/articles_by_keyword/<keyword>", methods=['GET'])
-def articles_by_keywords(keyword):
-    return DataAnalysis.keywords_service.getArticlesByKeyword(keyword)
+@app.route("/top_categories", methods=['GET'])
+def top_categories():
+    year = request.args.get('year', default=None, type=int)
+    month = request.args.get('month', default=None, type=int)
+    country = request.args.get('country', default=None, type=str)
+    return DataAnalysis.categories_service.getTopCategories(year, month, country)
 
 
-@app.route("/categories", methods=['GET'])
-def categories():
-    return DataAnalysis.categories_service.getCategoriesWithArticlesCount()
-
-
-@app.route("/articles_by_year/<year>", methods=['GET'])
-def articles_by_year(year):
-    return DataAnalysis.articles_service.getArticlesByYear(year)
-
-
-@app.route("/longest_articles", methods=['GET'])
-def longest_articles():
-    return DataAnalysis.articles_service.getLongestArticle()
+# @app.route("/articles_by_keyword/<keyword>", methods=['GET'])
+# def articles_by_keywords(keyword):
+#     return DataAnalysis.keywords_service.getArticlesByKeyword(keyword)
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

@@ -1,10 +1,17 @@
 from flask import Flask, jsonify, request
+
+import helpers
 import mongo_connection
 
 
 # this function is used to get top keywords
-def getTopKeyword():
-    pipeline = [
+def getTopKeyword(year, month, country):
+    pipeline = []
+    if year and month:
+        pipeline.extend(helpers.dateFilter(year, month))
+    if country:
+        pipeline.append(helpers.countryFilter(country))
+    pipeline.extend([
         {
             '$project': {
                 'keywords': 1,
@@ -34,7 +41,7 @@ def getTopKeyword():
         }, {
             '$limit': 10
         }
-    ]
+    ])
     result = list(mongo_connection.collection.aggregate(pipeline))
     return jsonify(result)
 
